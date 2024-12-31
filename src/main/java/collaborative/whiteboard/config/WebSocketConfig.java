@@ -1,5 +1,7 @@
 package collaborative.whiteboard.config;
 
+import collaborative.whiteboard.CollaborativeWhiteboardApplication;
+import collaborative.whiteboard.handler.WhiteboardHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -31,7 +33,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         // Register WebSocket endpoint with a URL
-        registry.addHandler(new CustomWebSocketHandler(), WEB_SOCKET_ENDPOINT)
+        registry.addHandler(new WhiteboardHandler(), WEB_SOCKET_ENDPOINT)
                 .setAllowedOrigins("*"); // Allow cross-origin requests
     }
 }
