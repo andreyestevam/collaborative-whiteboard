@@ -1,4 +1,4 @@
-package collaborative.whiteboard.collaborative_whiteboard;
+package collaborative.whiteboard;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
