@@ -12,6 +12,8 @@ import org.springframework.web.socket.WebSocketSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ADD CLASS HEADER COMMENT
@@ -24,6 +26,10 @@ public class WhiteboardHandler extends TextWebSocketHandler{
      * Thread-safety is ensured by utilizing a CopyOnWriteArrayList for concurrent access scenarios.
      */
     private List<WebSocketSession> activeSessions = new CopyOnWriteArrayList<>();
+    /**
+     * Used for logging events and messages within the WhiteboardHandler class.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(WhiteboardHandler.class);
 
     /**
      * Invoked after a new WebSocket connection has been established. This method adds the session
@@ -127,5 +133,28 @@ public class WhiteboardHandler extends TextWebSocketHandler{
                 }
             }
         }
+    }
+
+    /**
+     * Handles errors that occur during WebSocket transport, such as communication or protocol issues.
+     * This method logs the error, closes the WebSocket session, and broadcasts a message to other active
+     * users indicating the reason for the user's disconnection.
+     *
+     * @param session the WebSocket session in which the transport error occurred
+     * @param exception the exception that describes the transport error
+     * @throws Exception if an error occurs while handling the session closure or broadcasting the message
+     */
+    @Override
+    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+        // Log the error
+        logger.error("Transport error from {}: {}", session.getAttributes().get("username"), exception.getMessage(), exception);
+
+        // Close the session, broadcast to active users and log at the info level
+        if(session.isOpen()){
+            session.close(CloseStatus.SERVER_ERROR);
+        }
+        broadcastMessage("User " + session.getAttributes().get("username") +
+                " has left the room due to an error.", session);
+        logger.info("User {} has left the room due to an error.", session.getAttributes().get("username"));
     }
 }

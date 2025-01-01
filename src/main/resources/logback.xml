@@ -1,0 +1,11 @@
+<configuration>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>websocket.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="collaborative.whiteboard" level="ERROR" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+</configuration>
