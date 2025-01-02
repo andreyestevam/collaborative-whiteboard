@@ -2,6 +2,13 @@ package collaborative.whiteboard.model;
 
 import java.util.List;
 
+/**
+ * Represents a message that specifies drawing instructions, including the type, shape,
+ * color, starting coordinates, ending coordinates, and rotation for a given drawing operation.
+ * This class is primarily designed to handle drawing-related data in both 2D and 3D contexts.
+ *
+ * @author Andrey Estevam Seabra
+ */
 public class DrawingMessage{
     /**
      * Store the type of message (e.g. "draw").

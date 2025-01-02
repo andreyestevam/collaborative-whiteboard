@@ -1,4 +1,3 @@
-// Manages connections, processes messages, and broadcasts updates.
 package collaborative.whiteboard.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,7 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ADD CLASS HEADER COMMENT
+ * The WhiteboardHandler class is responsible for managing WebSocket connections,
+ * message exchange, and multi-user communication.
+ * It extends the TextWebSocketHandler class and provides custom implementations
+ * for handling WebSocket events such as connection establishment, closure,
+ * message transmission, and errors.
+ *
+ * @author Andrey Estevam Seabra
  */
 public class WhiteboardHandler extends TextWebSocketHandler{
     /**
@@ -43,10 +48,10 @@ public class WhiteboardHandler extends TextWebSocketHandler{
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         // Gets the query string and sets a default username.
         String query = session.getUri().getQuery();
-        String username = "Unknown user";
+        String username = "Unknown User";
 
         // Checks if the query string is valid (i.e. the user provided a username)
-        if(query != null && query.contains("username=")){
+        if(query != null && query.contains("username=") && query.indexOf("=") + 1 < query.length()){
             username = query.substring(query.indexOf("=") + 1);
         }
 
@@ -70,7 +75,7 @@ public class WhiteboardHandler extends TextWebSocketHandler{
             // Remove the closed connection's user from the activeSessions list and get its username, if any.
             activeSessions.remove(session);
             String username = (String) session.getAttributes().get("username");
-            if(session.getAttributes().get("username") == null)
+            if(username == null)
                 username = "Unknown user";
 
             // Outputs that someone has left and broadcast it to all active users.
@@ -149,12 +154,15 @@ public class WhiteboardHandler extends TextWebSocketHandler{
         // Log the error
         logger.error("Transport error from {}: {}", session.getAttributes().get("username"), exception.getMessage(), exception);
 
-        // Close the session, broadcast to active users and log at the info level
+        // Close the session, remove it from activeSessions, broadcast to active users and log at the info level
         if(session.isOpen()){
             session.close(CloseStatus.SERVER_ERROR);
         }
+        activeSessions.remove(session);
         broadcastMessage("User " + session.getAttributes().get("username") +
                 " has left the room due to an error.", session);
         logger.info("User {} has left the room due to an error.", session.getAttributes().get("username"));
     }
+
+    public List<WebSocketSession> getActiveSessions() {return activeSessions;}
 }
