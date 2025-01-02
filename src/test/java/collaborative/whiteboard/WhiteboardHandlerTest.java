@@ -10,12 +10,12 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -129,7 +129,74 @@ public class WhiteboardHandlerTest{
 
         RuntimeException transportException = new RuntimeException("Transport error");
         whiteboardHandler.handleTransportError(sessionOne, transportException);
+        whiteboardHandler.handleTransportError(sessionTwo, transportException);
         assertFalse(whiteboardHandler.getActiveSessions().contains(sessionOne));
+        assertFalse(whiteboardHandler.getActiveSessions().contains(sessionTwo));
         verify(sessionOne, never()).sendMessage(any(TextMessage.class));
+    }
+
+    @Test
+    public void testRapidConnectionAndDisconnection() throws Exception{
+        long startTime = System.nanoTime();
+        Vector<WebSocketSession> sessionsList = new Vector<>(100);
+        for(int i = 0; i < 100; i++){
+            WebSocketSession session = mock(WebSocketSession.class);
+            URI uri = new URI("/whiteboard?username=User" + i);
+            Map<String, Object> attributes = new HashMap<>();
+            when(session.getUri()).thenReturn(uri);
+            when(session.getAttributes()).thenReturn(attributes);
+            when(session.isOpen()).thenReturn(true);
+            sessionsList.add(session);
+            whiteboardHandler.afterConnectionEstablished(session);
+            assertTrue(whiteboardHandler.getActiveSessions().contains(session));
+            assertEquals("User" + i, session.getAttributes().get("username"));
+        }
+
+        for(int i = 0; i < 100; i++){
+            whiteboardHandler.afterConnectionClosed(sessionsList.get(i), CloseStatus.NORMAL);
+            assertFalse(whiteboardHandler.getActiveSessions().contains(sessionsList.get(i)));
+        }
+
+        assertTrue(whiteboardHandler.getActiveSessions().isEmpty());
+        long endTime = System.nanoTime();
+        long durationInSeconds = (endTime - startTime) / 1000000;
+        System.out.println("Total time taken for " + sessionsList.size() + " rapid connections and disconnections: " + durationInSeconds + " milliseconds.");
+    }
+
+    @Test
+    public void testHighTrafficConnections() throws Exception{
+        // Simulate connections
+        long startTime = System.nanoTime();
+        Vector<WebSocketSession> sessionsList = new Vector<>(100);
+        for(int i = 0; i < 100; i++){
+            WebSocketSession session = mock(WebSocketSession.class);
+            URI uri = new URI("/whiteboard?username=User" + i);
+            Map<String, Object> attributes = new HashMap<>();
+            when(session.getUri()).thenReturn(uri);
+            when(session.getAttributes()).thenReturn(attributes);
+            when(session.isOpen()).thenReturn(true);
+            sessionsList.add(session);
+            whiteboardHandler.afterConnectionEstablished(session);
+            assertTrue(whiteboardHandler.getActiveSessions().contains(session));
+            assertEquals("User" + i, session.getAttributes().get("username"));
+        }
+        assertEquals(100, whiteboardHandler.getActiveSessions().size());
+
+        // Simulate messages
+        String validJson = new ObjectMapper().writeValueAsString(new DrawingMessage(
+                "draw", "circle", "blue", List.of(0,0,0), List.of(1,1,0), null));
+        for(WebSocketSession session : sessionsList){
+            whiteboardHandler.handleTextMessage(session, new TextMessage(validJson));
+        }
+
+        // Check if every session received the message at least once per user and simulate disconnections
+        for(WebSocketSession session : sessionsList){
+            verify(session, times(99)).sendMessage(new TextMessage(validJson));
+            whiteboardHandler.afterConnectionClosed(session, null);
+        }
+        assertTrue(whiteboardHandler.getActiveSessions().isEmpty());
+        long endTime = System.nanoTime();
+        long durationInSeconds = (endTime - startTime) / 1000000;
+        System.out.println("Total time taken for " + sessionsList.size() + " rapid connections and disconnections: " + durationInSeconds + " milliseconds.");
     }
 }
