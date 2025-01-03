@@ -1,9 +1,7 @@
-package collaborative.whiteboard;
+package collaborative.whiteboard.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import collaborative.whiteboard.model.DrawingMessage;
-import collaborative.whiteboard.model.WhiteboardState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

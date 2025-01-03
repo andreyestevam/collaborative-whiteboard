@@ -1,6 +1,5 @@
-package collaborative.whiteboard;
+package collaborative.whiteboard.config;
 
-import collaborative.whiteboard.config.WebSocketConfig;
 import collaborative.whiteboard.handler.WhiteboardHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

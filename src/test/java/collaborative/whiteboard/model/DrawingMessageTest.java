@@ -1,6 +1,5 @@
-package collaborative.whiteboard;
+package collaborative.whiteboard.model;
 
-import collaborative.whiteboard.model.DrawingMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import java.util.Arrays;

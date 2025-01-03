@@ -1,16 +1,13 @@
-package collaborative.whiteboard;
+package collaborative.whiteboard.handler;
 
-import collaborative.whiteboard.handler.WhiteboardHandler;
 import collaborative.whiteboard.model.DrawingMessage;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.w3c.dom.Text;
-import java.io.IOException;
+
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
