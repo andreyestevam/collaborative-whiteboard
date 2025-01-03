@@ -12,7 +12,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Arrays;
 
-
+/**
+ * Unit tests for the {@code WhiteboardState} class.
+ *
+ * @author Andrey Estevam Seabra
+ */
 public class WhiteboardStateTest {
     private WhiteboardState whiteboardState;
 
