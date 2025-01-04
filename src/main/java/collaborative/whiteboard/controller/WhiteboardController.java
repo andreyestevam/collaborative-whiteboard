@@ -1,7 +1,10 @@
 package collaborative.whiteboard.controller;
 
+import collaborative.whiteboard.controller.exception.GlobalExceptionHandler;
 import collaborative.whiteboard.model.WhiteboardState;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * The WhiteboardController class serves as a REST API controller for managing
@@ -29,8 +32,13 @@ public class WhiteboardController {
      */
     @PostMapping("/save")
     public String saveState(@RequestBody WhiteboardState state){
+        if(state.getTimeStamp() == null || state.getTimeStamp().isEmpty()){
+            throw new IllegalArgumentException("Timestamp cannot be null or empty."); // Handled by GlobalExceptionHandler.
+        }
+        if(state.getVersion() <= 0){
+            throw new IllegalArgumentException("Version must be greater than 0.");
+        }
         currentState = state;
-        System.out.println("Current state saved.");
         return "Whiteboard current state successfully saved.";
     }
 
@@ -43,7 +51,7 @@ public class WhiteboardController {
     @GetMapping("/load")
     public WhiteboardState loadState(){
         if(currentState == null){
-            return new WhiteboardState(); // Return an empty state.
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No state found.");
         }
         return currentState; // Return the last saved state.
     }
