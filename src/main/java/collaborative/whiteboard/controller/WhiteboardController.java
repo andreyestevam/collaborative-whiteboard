@@ -30,6 +30,7 @@ public class WhiteboardController {
     @PostMapping("/save")
     public String saveState(@RequestBody WhiteboardState state){
         currentState = state;
+        System.out.println("Current state saved.");
         return "Whiteboard current state successfully saved.";
     }
 
