@@ -2,34 +2,40 @@ package collaborative.whiteboard.model;
 
 import java.util.List;
 
-
+/**
+ * Represents a Triangle drawing, extending the functionality of the DrawingMessage class.
+ *
+ * @author Andrey Estevam Seabra
+ */
 public class Triangle extends DrawingMessage{
     /**
      * Store the vertices of the triangle. Each vertice is a List of [x,y,z].
      */
-    private List<List<Integer>> vertices;
+    private List<List<Double>> vertices;
 
     /**
      * Default constructor.
      */
     public Triangle(){
         super();
-        this.vertices = null;
+        super.setShape("triangle");
+        this.vertices = List.of(
+                List.of(-2.0, -2.0, 0.0),
+                List.of(2.0, -2.0, 0.0),
+                List.of(0.0, 2.0, 0.0)
+        );
     }
 
     /**
      * Parameterized constructor.
      *
      * @param type the type of the drawing message (e.g., "draw").
-     * @param shape the shape to be drawn (e.g., "triangle").
      * @param color the color of the triangle (e.g., "green").
-     * @param start the coordinates of the starting point of the triangle.
-     * @param end the coordinates of the ending point of the triangle.
      * @param rotation the orientation of the triangle for a 3D version; unused in the 2D version.
      * @param vertices the list of vertex points representing the triangle. Each vertex is a list of [x, y, z] coordinates.
      */
-    public Triangle(String type, String shape, String color, List<Integer> start, List<Integer> end, List<Integer> rotation, List<List<Integer>> vertices) {
-        super(type, shape, color, start, end, rotation);
+    public Triangle(String type, String color, List<Double> rotation, List<List<Double>> vertices) {
+        super(type, "triangle", color, rotation);
         this.vertices = vertices;
     }
 
@@ -45,7 +51,7 @@ public class Triangle extends DrawingMessage{
     }
 
     // Getter and setter methods.
-    public List<List<Integer>> getVertices() {return vertices;}
+    public List<List<Double>> getVertices() {return vertices;}
 
-    public void setVertices(List<List<Integer>> vertices) {this.vertices = vertices;}
+    public void setVertices(List<List<Double>> vertices) {this.vertices = vertices;}
 }

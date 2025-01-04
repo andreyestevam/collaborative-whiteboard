@@ -28,19 +28,9 @@ public class DrawingMessage{
      */
     private String color;
     /**
-     * Store the coordinates of the start point of the message (e.g. [x,y,z]).
-     * z-coordinate is set to 0 for the 2D version.
-     */
-    private List<Integer> start;
-    /**
-     * Store the coordinates of the end point of the message (e.g. [x,y,z]).
-     * z-coordinate is set to 0 for the 2D version.
-     */
-    private List<Integer> end;
-    /**
      * Store the orientation of the object. Not currently used for the 2D version (will be implemented for the 3D version).
      */
-    private List<Integer> rotation; // Not currently used, but will be implemented for the 3D version.
+    private List<Double> rotation; // Not currently used, but will be implemented for the 3D version.
 
     /**
      * Default constructor, required for Jackson.
@@ -55,18 +45,14 @@ public class DrawingMessage{
      * @param type the type of the message.
      * @param shape the shape to be drawn.
      * @param color the color of the shape.
-     * @param start the coordinates of the starting point of the shape.
-     * @param end the coordinates of the ending point of the shape.
      * @param rotation the orientation of the object for a 3D version; unused in the 2D version.
      */
-    public DrawingMessage(String type, String shape, String color, List<Integer> start, List<Integer> end, List<Integer> rotation){
+    public DrawingMessage(String type, String shape, String color, List<Double> rotation){
         // Initializes all the member variables.
         this.id = UUID.randomUUID().toString();
         this.type = type;
         this.shape = shape;
         this.color = color;
-        this.start = start;
-        this.end = end;
         this.rotation = rotation;
     }
 
@@ -77,8 +63,6 @@ public class DrawingMessage{
                 ", type='" + type + '\'' +
                 ", shape='" + shape + '\'' +
                 ", color='" + color + '\'' +
-                ", start=" + start +
-                ", end=" + end +
                 ", rotation=" + rotation +
                 '}';
     }
@@ -110,27 +94,11 @@ public class DrawingMessage{
         this.color = color;
     }
 
-    public List<Integer> getStart(){
-        return start;
-    }
-
-    public void setStart(List<Integer> start){
-        this.start = start;
-    }
-
-    public List<Integer> getEnd(){
-        return end;
-    }
-
-    public void setEnd(List<Integer> end){
-        this.end = end;
-    }
-
-    public List<Integer> getRotation(){
+    public List<Double> getRotation(){
         return rotation;
     }
 
-    public void setRotation(List<Integer> rotation){
+    public void setRotation(List<Double> rotation){
         this.rotation = rotation;
     }
 }

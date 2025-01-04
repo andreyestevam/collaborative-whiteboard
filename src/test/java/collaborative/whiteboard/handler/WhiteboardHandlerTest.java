@@ -100,7 +100,7 @@ public class WhiteboardHandlerTest{
         when(sessionOne.isOpen()).thenReturn(true);
         when(sessionTwo.isOpen()).thenReturn(true);
         String validJson = new ObjectMapper().writeValueAsString(new DrawingMessage(
-                "draw", "circle", "blue", List.of(0,0,0), List.of(1,1,0), null));
+                "draw", "circle", "blue", null));
         whiteboardHandler.afterConnectionEstablished(sessionOne);
         whiteboardHandler.afterConnectionEstablished(sessionTwo);
 
@@ -181,7 +181,7 @@ public class WhiteboardHandlerTest{
 
         // Simulate messages
         String validJson = new ObjectMapper().writeValueAsString(new DrawingMessage(
-                "draw", "circle", "blue", List.of(0,0,0), List.of(1,1,0), null));
+                "draw", "circle", "blue", null));
         for(WebSocketSession session : sessionsList){
             whiteboardHandler.handleTextMessage(session, new TextMessage(validJson));
         }

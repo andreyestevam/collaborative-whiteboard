@@ -38,9 +38,7 @@ public class WhiteboardStateTest {
 
         List<DrawingMessage> drawingMessages = new ArrayList<>();
         for(int i = 0; i < 10; i++){
-            drawingMessages.add(new DrawingMessage("draw",
-                    "circle", "blue", Arrays.asList(0, 0, 0),
-                    Arrays.asList(1, 1, 0), null));
+            drawingMessages.add(new DrawingMessage("draw","circle", "blue", null));
         }
         String timeStamp = new Date().toString();
         whiteboardState.setDrawingMessages(drawingMessages);

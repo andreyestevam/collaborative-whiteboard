@@ -9,6 +9,10 @@ import java.util.List;
  */
 public class Rectangle extends DrawingMessage{
     /**
+     * Store the center point of the rectangle.
+     */
+    private List<Double> center;
+    /**
      * Store the width of the rectangle drawing.
      */
     private double width;
@@ -22,44 +26,72 @@ public class Rectangle extends DrawingMessage{
      */
     public Rectangle(){
         super();
-        this.width = 0;
-        this.height = 0;
+        super.setShape("rectangle");
+        // Width and height set to a standard value if none are given.
+        this.width = 10;
+        this.height = 10;
+        this.center = List.of(0.0, 0.0, 0.0); // Rectangle will be located a the origin.
     }
 
     /**
      * Parameterized constructor.
      *
      * @param type the type of the drawing message (e.g., "draw").
-     * @param shape the shape to be drawn (e.g., "rectangle").
      * @param color the color of the rectangle (e.g., "blue").
-     * @param start the coordinates of the starting point of the rectangle.
-     * @param end the coordinates of the ending point of the rectangle.
      * @param rotation the orientation of the rectangle for a 3D version; unused in the 2D version.
      * @param width the width of the rectangle.
      * @param height the height of the rectangle.
      */
-    public Rectangle(String type, String shape, String color, List<Integer> start, List<Integer> end, List<Integer> rotation, double width, double height) {
-        super(type, shape, color, start, end, rotation);
+    public Rectangle(String type, String color, List<Double> rotation, double width, double height, List<Double> center) {
+        super(type, "rectangle", color, rotation);
         this.width = width;
         this.height = height;
+        this.center = center;
+    }
+
+    /**
+     * Calculates the coordinate of the top left corner of the rectangle.
+     *
+     * @return a list containing the coordinates.
+     */
+    public List<Double> getTopLeftCorner(){
+        return List.of(
+                (center.get(0) - width/2),
+                (center.get(1) + height/2),
+                center.get(2)
+        );
+    }
+
+    /**
+     * Calculates the coordinate of the bottom right corner of the rectangle.
+     *
+     * @return a list containing the coordinates.
+     */
+    public List<Double> getBottomRightCorner(){
+        return List.of(
+                (center.get(0) + width/2),
+                (center.get(1) - height/2),
+                center.get(2)
+        );
     }
 
     @Override
     public String toString() {
         return "Rectangle{" +
                 "id=" + getId() +
-                ", width=" + width +
-                ", height=" + height +
                 ", type=" + getType() +
                 ", shape=" + getShape() +
                 ", color=" + getColor() +
-                ", start=" + getStart() +
-                ", end=" + getEnd() +
+                ", center=" + center +
+                ", width=" + width +
+                ", height=" + height +
+                ", topLeftCorner=" + getTopLeftCorner() +
+                ", bottomRightCorner=" + getBottomRightCorner() +
                 ", rotation=" + getRotation() +
                 '}';
     }
 
-    // Getters and setters below.
+    // Getters and Setters.
     public double getWidth() {return width;}
 
     public void setWidth(double width) {this.width = width;}
@@ -67,4 +99,8 @@ public class Rectangle extends DrawingMessage{
     public double getHeight() {return height;}
 
     public void setHeight(double height) {this.height = height;}
+
+    public List<Double> getCenter() {return center;}
+
+    public void setCenter(List<Double> center) {this.center = center;}
 }
