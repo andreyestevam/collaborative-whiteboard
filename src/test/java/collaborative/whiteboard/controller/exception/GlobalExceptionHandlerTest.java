@@ -22,6 +22,4 @@ public class GlobalExceptionHandlerTest {
         mockMvc.perform(post("/api/whiteboard/save").contentType("application/json").content(invalidJson))
                 .andExpect(status().isBadRequest());
     }
-
-
 }
