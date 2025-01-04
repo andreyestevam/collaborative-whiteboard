@@ -1,5 +1,6 @@
 package collaborative.whiteboard.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -31,6 +32,19 @@ public class WhiteboardState {
      * Default constructor required for JSON deserialization.
      */
     public WhiteboardState(){}
+
+    /**
+     * Constructs a new WhiteboardState with the specified parameters.
+     *
+     * @param drawingMessages a list of DrawingMessage objects representing the drawing actions on the whiteboard.
+     * @param timeStamp the timestamp indicating when the state was saved.
+     * @param version the version number of this whiteboard state.
+     */
+    public WhiteboardState(List<DrawingMessage> drawingMessages, String timeStamp, int version){
+        this.drawingMessages = drawingMessages;
+        this.timeStamp = timeStamp;
+        this.version = version;
+    }
 
     @Override
     public String toString() {
