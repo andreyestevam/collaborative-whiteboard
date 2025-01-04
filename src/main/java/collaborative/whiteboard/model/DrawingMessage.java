@@ -1,6 +1,7 @@
 package collaborative.whiteboard.model;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Represents a message that specifies drawing instructions, including the type, shape,
@@ -10,6 +11,10 @@ import java.util.List;
  * @author Andrey Estevam Seabra
  */
 public class DrawingMessage{
+    /**
+     * Store the id of the message, ensuring each message can be uniquely searched.
+     */
+    private final String id;
     /**
      * Store the type of message (e.g. "draw").
      */
@@ -41,6 +46,7 @@ public class DrawingMessage{
      * Default constructor, required for Jackson.
      */
     public DrawingMessage(){
+        this.id = UUID.randomUUID().toString();
     }
 
     /**
@@ -55,6 +61,7 @@ public class DrawingMessage{
      */
     public DrawingMessage(String type, String shape, String color, List<Integer> start, List<Integer> end, List<Integer> rotation){
         // Initializes all the member variables.
+        this.id = UUID.randomUUID().toString();
         this.type = type;
         this.shape = shape;
         this.color = color;
@@ -63,7 +70,22 @@ public class DrawingMessage{
         this.rotation = rotation;
     }
 
+    @Override
+    public String toString() {
+        return "DrawingMessage{" +
+                "id='" + id + '\'' +
+                ", type='" + type + '\'' +
+                ", shape='" + shape + '\'' +
+                ", color='" + color + '\'' +
+                ", start=" + start +
+                ", end=" + end +
+                ", rotation=" + rotation +
+                '}';
+    }
+
     // Getter and setter methods.
+    public String getId(){return id;}
+
     public String getType(){
         return type;
     }

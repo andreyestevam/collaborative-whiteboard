@@ -39,7 +39,7 @@ public class DrawingMessageTest {
 
         // Serialize the drawingMessage into JSON
         String json = objectMapper.writeValueAsString(drawingMessage);
-        assertEquals("{\"type\":\"draw\",\"shape\":\"line\",\"color\":\"blue\",\"start\":[0,0,0],\"end\":[1,1,0],\"rotation\":null}", json);
+        assertEquals("{\"id\":\"" + drawingMessage.getId() + "\",\"type\":\"draw\",\"shape\":\"line\",\"color\":\"blue\",\"start\":[0,0,0],\"end\":[1,1,0],\"rotation\":null}", json);
 
         // Deserialize the JSON into DrawingMessage
         DrawingMessage deserializedDrawingMessage = objectMapper.readValue(json, DrawingMessage.class);
