@@ -3,6 +3,7 @@ package collaborative.whiteboard.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import collaborative.whiteboard.model.DrawingMessage;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Andrey Estevam Seabra
  */
+@Component
 public class WhiteboardHandler extends TextWebSocketHandler{
     /**
      * Maintains a thread-safe list of active WebSocket sessions.
