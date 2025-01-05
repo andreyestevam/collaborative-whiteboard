@@ -122,4 +122,10 @@ public class StateManager {
             e.printStackTrace();
         }
     }
+
+    public List<WebSocketSession> getActiveSessions(){return whiteboardHandler.getActiveSessions();}
+
+    public Stack<WhiteboardState> getUndoStack(){return undoStack;}
+
+    public Stack<WhiteboardState> getRedoStack(){return redoStack;}
 }
