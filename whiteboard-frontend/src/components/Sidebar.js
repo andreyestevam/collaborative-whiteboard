@@ -11,11 +11,11 @@ import {jsPDF} from 'jspdf';
  * @param undo (function) undo the last stroke from the whiteboard.
  * @param redo (funtion) redo the last undone stroke.
  * @param strokes (array) the current array of strokes drawn on the whiteboard.
- * @param setStrokes (function) update the strokes state.
+ * @param stageRef (React ref) reference to the Konva `Stage` instance.
  * @returns {Element} a React element rendering the sidebar with export and undo/redo functionality.
  * @author Andrey Estevam Seabra
  */
-const Sidebar = ({undo, redo, strokes, setStrokes}) => {
+const Sidebar = ({undo, redo, strokes, stageRef}) => {
     // State to toggle dropdown visibility
     const [dropdownVisible, setDropdownVisible] = useState(false);
 

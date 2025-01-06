@@ -1,4 +1,5 @@
 import React from "react";
+import ColorPicker from "./ColorPicker";
 
 /**
  * Toolbar component. Provides controls for drawing, including tool selection,
@@ -19,6 +20,8 @@ const Toolbar = ({setTool, setColor, setLineWidth, clearWhiteboard}) => {
             {/*Buttons to select the drawing and eraser tool.*/}
             <button onClick={() => setTool('pen')}>Pen</button>
             <button onClick={() => setTool('eraser')}>Eraser</button>
+
+            <ColorPicker setColor={setColor} />
 
             {/*Color picker to set the drawing color.*/}
             <input

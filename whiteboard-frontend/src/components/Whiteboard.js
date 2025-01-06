@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import '../styles/Whiteboard.css';
-import Konva, {Stage, Layer, Line} from "konva";
+import {Stage, Layer, Line} from "konva";
 
 /**
  * Whiteboard component. Renders an interactive whiteboard for users to draw on.
@@ -15,11 +15,12 @@ import Konva, {Stage, Layer, Line} from "konva";
  * @param setStrokes (function) update the array of completed strokes.
  * @param redoStack (array) stack of undone strokes available for redo.
  * @param setRedoStack (function) update the redo stack.
+ * @param stageRef (React ref) reference to the Konva `Stage` instance.
  * @returns {Element} a React element representing the canvas and the drawing area.
  *
  * @author Andrey Estevam Seabra
  */
-const Whiteboard = ({tool, color, lineWidth, strokes, setStrokes, redoStack, setRedoStack}) => {
+const Whiteboard = ({tool, color, lineWidth, strokes, setStrokes, redoStack, setRedoStack, stageRef}) => {
     // Store the current stroke being drawn. Updated whenever the user moves the mouse.
     const [currentStroke, setCurrentStroke] = useState([]);
 
@@ -57,6 +58,7 @@ const Whiteboard = ({tool, color, lineWidth, strokes, setStrokes, redoStack, set
 
     return(
         <Stage
+            ref={stageRef}
             width={window.innerWidth}
             height={window.innerHeight}
             onMouseDown={handleMouseDown}
