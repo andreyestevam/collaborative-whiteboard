@@ -1,5 +1,5 @@
 import './App.css';
-import React, {useEffect, useState, useRef} from "react";
+import React, {useEffect, useState, useRef, useCallback} from "react";
 import Whiteboard from './components/Whiteboard';
 import Toolbar from './components/Toolbar';
 import Sidebar from './components/Sidebar';
@@ -28,24 +28,30 @@ const App = () => {
     /**
      * Handle undoing the last stroke. Moves the last stroke from the strokes array to the redo stack.
      */
-    const undo = () => {
-        if(strokes.length > 0){
-            const lastStroke = strokes[strokes.length-1];
-            setRedoStack([...redoStack, lastStroke]); // Add the last stroke to the redo stack.
-            setStrokes(strokes.slice(0, -1)); // Remove the last stroke.
-        }
-    }
+    const undo = useCallback(() => {
+        setStrokes((prevStrokes) => {
+            if(prevStrokes.length > 0){
+                const lastStroke = prevStrokes[prevStrokes.length-1];
+                setRedoStack((prevRedoStack) =>[...redoStack, lastStroke]); // Add the last stroke to the redo stack.
+                return prevStrokes.slice(0, -1); // Remove the last stroke.
+            }
+            return prevStrokes; // Return unchanged if no strokes.
+        });
+    }, []);
 
     /**
      * Handle redoing the last undone stroke. Moves the last stroke from the redo stack back to the strokes array.
      */
-    const redo = () => {
-        if(redoStack.length > 0){
-            const lastRedoStroke = redoStack[redoStack.length-1];
-            setStrokes([...strokes, lastRedoStroke]) // Add the last undone stroke back to strokes.
-            setRedoStack(redoStack.slice(0, -1)); // Remove the stroke from redo stack.
-        }
-    }
+    const redo = useCallback(() => {
+        setRedoStack((prevRedoStack) => {
+            if(prevRedoStack.length > 0){
+                const lastRedoStroke = prevRedoStack[prevRedoStack.length-1];
+                setStrokes((prevStrokes) =>[...prevStrokes, lastRedoStroke]) // Add the last undone stroke back to strokes.
+                return prevRedoStack.slice(0, -1); // Remove the stroke from redo stack.
+            }
+            return prevRedoStack; // Return unchanged if no redo items.
+        })
+    }, []);
 
     /**
      * Clear the whiteboard. Clears both the strokes array and the redo stack.
