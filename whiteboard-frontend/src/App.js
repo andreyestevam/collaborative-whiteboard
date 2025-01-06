@@ -22,8 +22,7 @@ const App = () => {
     const [lineWidth, setLineWidth] = useState(2);
     const [strokes, setStrokes] = useState([]);
     const [redoStack, setRedoStack] = useState([]); // Stack for redo functionality.
-
-    const stageRef = useRef(null);
+    const whiteboardRef = useRef(null);
 
     /**
      * Handle undoing the last stroke. Moves the last stroke from the strokes array to the redo stack.
@@ -100,9 +99,9 @@ const App = () => {
                     redo={redo}
                     strokes={strokes}
                     setStrokes={setStrokes}
-                    stageRef={stageRef}
                 />
                 <Whiteboard
+                    ref={whiteboardRef}
                     tool={tool}
                     color={color}
                     lineWidth={lineWidth}
@@ -110,7 +109,6 @@ const App = () => {
                     setStrokes={setStrokes}
                     redoStack={redoStack}
                     setRedoStack={setRedoStack}
-                    stageRef={stageRef}
                 />
             </div>
         </div>

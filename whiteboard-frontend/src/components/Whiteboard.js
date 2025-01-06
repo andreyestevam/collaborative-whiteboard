@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, forwardRef} from 'react';
 import '../styles/Whiteboard.css';
 import {Stage, Layer, Line} from "konva";
 
@@ -20,7 +20,7 @@ import {Stage, Layer, Line} from "konva";
  *
  * @author Andrey Estevam Seabra
  */
-const Whiteboard = ({tool, color, lineWidth, strokes, setStrokes, redoStack, setRedoStack, stageRef}) => {
+const Whiteboard = React.forwardRef(({tool, color, lineWidth, strokes, setStrokes, redoStack, setRedoStack}, ref) => {
     // Store the current stroke being drawn. Updated whenever the user moves the mouse.
     const [currentStroke, setCurrentStroke] = useState([]);
 
@@ -58,12 +58,12 @@ const Whiteboard = ({tool, color, lineWidth, strokes, setStrokes, redoStack, set
 
     return(
         <Stage
-            ref={stageRef}
             width={window.innerWidth}
             height={window.innerHeight}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
+            ref={ref}
         >
             <Layer>
                 {/*Render all completed strokes.*/}
@@ -92,6 +92,6 @@ const Whiteboard = ({tool, color, lineWidth, strokes, setStrokes, redoStack, set
             </Layer>
         </Stage>
     );
-};
+});
 
 export default Whiteboard;
