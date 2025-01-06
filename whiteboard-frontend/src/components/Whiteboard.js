@@ -2,28 +2,33 @@ import React, {useState} from 'react';
 import '../styles/Whiteboard.css';
 import Konva, {Stage, Layer, Line} from "konva";
 
-const Whiteboard = () => {
-    // Store completed strokes (each stroke is an object with properties like tool, color, lineWidth, and points)
-    const [strokes, setStrokes] = useState([]);
-
+/**
+ * Whiteboard component. Renders an interactive whiteboard for users to draw on.
+ * Uses Konva to handle the canvas and drawing functionality.
+ * Users can draw using tools like pen and eraser, customize their stroke color and width,
+ * and interact with previously drawn strokes using undo/redo features.
+ *
+ * @param tool (string) the current drawing tool (e.g. "pen", "eraser").
+ * @param color (string) the color of the current stroke.
+ * @param lineWidth (number) the width of the current stroke.
+ * @param strokes (array) all the completed strokes. Each stroke is an object.
+ * @param setStrokes (function) update the array of completed strokes.
+ * @param redoStack (array) stack of undone strokes available for redo.
+ * @param setRedoStack (function) update the redo stack.
+ * @returns {Element} a React element representing the canvas and the drawing area.
+ *
+ * @author Andrey Estevam Seabra
+ */
+const Whiteboard = ({tool, color, lineWidth, strokes, setStrokes, redoStack, setRedoStack}) => {
     // Store the current stroke being drawn. Updated whenever the user moves the mouse.
     const [currentStroke, setCurrentStroke] = useState([]);
-
-    // Store the selected drawing tool.
-    const [tool, setTool] = useState('pen');
-
-    // Store the color for the stroke.
-    const [color, setColor] = useState('black');
-
-    // Store the line width of the stroke.
-    const [lineWidth, setLineWidth] = useState(2);
 
     // Handle the start of a new stroke.
     const handleMouseDown = (e) => {
         const stage = e.target.getStage();
         const point = stage.getPointerPosition();
         setCurrentStroke([{tool, color, lineWidth, points: [point.x, point.y]}]);
-    }
+    };
 
     // Handle the drawing.
     const handleMouseMove = (e) => {
@@ -37,14 +42,18 @@ const Whiteboard = () => {
         const newStroke = [...currentStroke];
         newStroke[0].points = [...newStroke[0].points, point.x, point.y];
         setCurrentStroke(newStroke);
-    }
+    };
 
     // Handle the end of a stroke.
-    const handleMouseUp = (e) => {
-        // Add the completed stroke to the strokes array and clear the current stroke.
-        setStrokes([...strokes, ...currentStroke]);
-        setCurrentStroke([]);
-    }
+    const handleMouseUp = () => {
+        if(currentStroke.length > 0){
+            setStrokes((prevStrokes) => {
+                setRedoStack([]); // Clear the redo stack whenever a new stroke is added.
+                return [...prevStrokes, ...currentStroke]; // Add the new stroke to strokes.
+            });
+            setCurrentStroke([]);
+        }
+    };
 
     return(
         <Stage
@@ -60,6 +69,7 @@ const Whiteboard = () => {
                     <Line
                     key={index}
                     points={stroke.points}
+                    stroke={stroke.color}
                     strokeWidth={stroke.lineWidth}
                     lineCap="round"
                     lineJoin="round"

@@ -1,6 +1,20 @@
 import React, {useState} from "react";
 import {jsPDF} from 'jspdf';
 
+/**
+ * Sidebar Component.
+ *
+ * Provides the user interface for managing whiteboard exports and undo/redo functionality.
+ * Includes a dropdown menu with options for exporting the whiteboard content in various
+ * formats (JSON, PDF, PNG) and buttons for undoing and redoing strokes on the whiteboard.
+ *
+ * @param undo (function) undo the last stroke from the whiteboard.
+ * @param redo (funtion) redo the last undone stroke.
+ * @param strokes (array) the current array of strokes drawn on the whiteboard.
+ * @param setStrokes (function) update the strokes state.
+ * @returns {Element} a React element rendering the sidebar with export and undo/redo functionality.
+ * @author Andrey Estevam Seabra
+ */
 const Sidebar = ({undo, redo, strokes, setStrokes}) => {
     // State to toggle dropdown visibility
     const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -54,6 +68,12 @@ const Sidebar = ({undo, redo, strokes, setStrokes}) => {
                     <button onClick={handleExportPNG}>Export as PNG</button>
                     </div>
                 )}
+            </div>
+
+        {/*Undo and Redo Buttons*/}
+            <div className="actions">
+                <button onClick={undo}>Undo</button>
+                <button onClick={redo}>Redo</button>
             </div>
         </div>
     )
