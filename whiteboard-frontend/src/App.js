@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Whiteboard from './components/Whiteboard';
 import Toolbar from './components/Toolbar';
 import Sidebar from './components/Sidebar';
@@ -53,6 +53,28 @@ const App = () => {
         setStrokes([]); // Clear all strokes.
         setRedoStack([]); // Clear redo stack.
     }
+
+    /**
+     * Adds user functionality by undoing and redoing strokes with keyboard shortcuts.
+     * For undoing, press Ctrl+Z or Cmd+Z.
+     * For redoing, press Ctrl+Shift+Z or Cmd+Shift+Z
+     */
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if((e.ctrlKey || e.metaKey) && e.key  === "z"){
+                if(e.shiftKey){
+                    redo(); // Ctrl+Shift+Z or Cmd+Shift+Z
+                }else{
+                    undo(); // Ctrl+Z or Cmd+Z
+                }
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [undo, redo]);
 
     return (
         <div className="app-container">
