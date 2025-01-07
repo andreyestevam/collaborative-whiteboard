@@ -5,6 +5,8 @@ import ColorPicker from '../components/ColorPicker';
 
 /**
  * Unit tests for the ColorPicker component.
+ *
+ * @author Andrey Estevam Seabra
  */
 describe('ColorPicker Component', () => {
     test('renders the color picker with default elements', () => {
