@@ -36,7 +36,7 @@ const App = () => {
             }
             return prevStrokes; // Return unchanged if no strokes.
         });
-    }, []);
+    }, [redoStack]);
 
     /**
      * Handle redoing the last undone stroke. Moves the last stroke from the redo stack back to the strokes array.

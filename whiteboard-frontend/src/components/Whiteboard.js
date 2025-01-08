@@ -1,4 +1,4 @@
-import React, {useState, forwardRef} from 'react';
+import React, {useState} from 'react';
 import '../styles/Whiteboard.css';
 import {Stage, Layer, Line} from "konva";
 
