@@ -9,19 +9,71 @@ import {jsPDF} from 'jspdf';
  * formats (JSON, PDF, PNG) and buttons for undoing and redoing strokes on the whiteboard.
  *
  * @param undo (function) undo the last stroke from the whiteboard.
- * @param redo (funtion) redo the last undone stroke.
+ * @param redo (function) redo the last undone stroke.
  * @param strokes (array) the current array of strokes drawn on the whiteboard.
  * @param stageRef (React ref) reference to the Konva `Stage` instance.
+ * @param setStrokes (function) state updater function for the `strokes` array.
  * @returns {Element} a React element rendering the sidebar with export and undo/redo functionality.
  * @author Andrey Estevam Seabra
  */
-const Sidebar = ({undo, redo, strokes, stageRef}) => {
+const Sidebar = ({undo, redo, strokes, stageRef, setStrokes}) => {
     // State to toggle dropdown visibility
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
     // Toggle dropdown visibility
     const toggleDropdown = () => {
         setDropdownVisible(!dropdownVisible);
+    };
+
+    /**
+     * Save the current whiteboard state to the backend.
+     */
+    const saveState = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/api/whiteboard/save", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    drawingMessages: strokes, // Send strokes as part of the state
+                    version: 1,
+                    timeStamp: new Date().toISOString(),
+                }),
+            });
+
+            if (response.ok) {
+                console.log("Whiteboard state saved.");
+                alert("Whiteboard state saved successfully!");
+            } else {
+                console.error("Failed to save state.");
+                alert("Failed to save the whiteboard state.");
+            }
+        } catch (error) {
+            console.error("Error saving state:", error);
+            alert("Error saving the whiteboard state.");
+        }
+    };
+
+    /**
+     * Load the whiteboard state from the backend.
+     */
+    const loadState = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/api/whiteboard/load");
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Loaded state: ", data);
+                setStrokes(data.drawingMessages || []); // Update the whiteboard with loaded strokes
+                alert("Whiteboard state loaded successfully!");
+            } else {
+                console.error("Failed to load state.");
+                alert("Failed to load the whiteboard state.");
+            }
+        } catch (error) {
+            console.error("Error loading state:", error);
+            alert("Error loading the whiteboard state.");
+        }
     };
 
     const handleExportJSON = () => {
@@ -63,20 +115,26 @@ const Sidebar = ({undo, redo, strokes, stageRef}) => {
                 {/* Dropdown Menu: Render conditionally based on dropdownVisible.*/}
                 {dropdownVisible && (
                     <div className="dropdown-menu">
-                    <button onClick={handleExportJSON}>Export as JSON</button>
-                    <button onClick={handleExportPDF}>Export as PDF</button>
-                    <button onClick={handleExportPNG}>Export as PNG</button>
+                        <button onClick={handleExportJSON}>Export as JSON</button>
+                        <button onClick={handleExportPDF}>Export as PDF</button>
+                        <button onClick={handleExportPNG}>Export as PNG</button>
                     </div>
                 )}
             </div>
 
-        {/*Undo and Redo Buttons*/}
+            {/*Undo and Redo Buttons*/}
             <div className="actions">
                 <button onClick={undo}>Undo</button>
                 <button onClick={redo}>Redo</button>
             </div>
+
+            {/*Save and Load Buttons*/}
+            <div className="save-load">
+                <button onClick={saveState}>Save Whiteboard</button>
+                <button onClick={loadState}>Load Whiteboard</button>
+            </div>
         </div>
-    )
-}
+    );
+};
 
 export default Sidebar;

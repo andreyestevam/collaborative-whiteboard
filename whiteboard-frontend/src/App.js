@@ -3,7 +3,7 @@ import React, {useEffect, useState, useRef, useCallback} from "react";
 import Whiteboard from './components/Whiteboard';
 import Toolbar from './components/Toolbar';
 import Sidebar from './components/Sidebar';
-import "./App.css"
+import {connectWebSocket} from "./utils/websocket"
 
 /**
  * The main application component for the Collaborative Whiteboard project.
@@ -23,6 +23,20 @@ const App = () => {
     const [strokes, setStrokes] = useState([]);
     const [redoStack, setRedoStack] = useState([]); // Stack for redo functionality.
     const whiteboardRef = useRef(null);
+
+    /**
+     * Callback for handling incoming WebSocket messages.
+     */
+    const handleIncomingMessage = (data) => {
+        setStrokes((prevStrokes) => [...prevStrokes, data]);
+    };
+
+    /**
+     * Initializes WebSocket on mount.
+     */
+    useEffect(() => {
+        connectWebSocket(handleIncomingMessage);
+    }, []);
 
     /**
      * Handle undoing the last stroke. Moves the last stroke from the strokes array to the redo stack.

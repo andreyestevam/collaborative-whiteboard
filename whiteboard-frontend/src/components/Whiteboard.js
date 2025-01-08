@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import '../styles/Whiteboard.css';
 import {Stage, Layer, Line} from "konva";
+import {sendDrawingMessage} from "../utils/websocket";
 
 /**
  * Whiteboard component. Renders an interactive whiteboard for users to draw on.
@@ -52,6 +53,10 @@ const Whiteboard = React.forwardRef(({tool, color, lineWidth, strokes, setStroke
                 setRedoStack([]); // Clear the redo stack whenever a new stroke is added.
                 return [...prevStrokes, ...currentStroke]; // Add the new stroke to strokes.
             });
+
+            // Send the current stroke to the backend.
+            sendDrawingMessage(currentStroke[0]);
+
             setCurrentStroke([]);
         }
     };
