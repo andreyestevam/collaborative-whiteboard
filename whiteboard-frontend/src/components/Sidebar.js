@@ -30,30 +30,34 @@ const Sidebar = ({undo, redo, strokes, stageRef, setStrokes}) => {
      * Save the current whiteboard state to the backend.
      */
     const saveState = async () => {
-        const drawingMessages = strokes.reduce((acc, stroke) => {
-            acc[stroke.id] = stroke;
-            return acc;
-        }, {});
-
-        const requestBody = {
-            drawingMessages: drawingMessages,
-            version: version++,
-            timeStamp: new Date().toISOString(),
-        };
-
-        console.log("Request body:", requestBody);
-
         try {
+            const drawingMessages = strokes.reduce((acc, stroke) => {
+                acc[stroke.id] = {
+                    id: stroke.id,
+                    type: stroke.type || "draw",
+                    shape: stroke.shape || "line",
+                    color: stroke.color || "black",
+                    rotation: stroke.rotation || 0, // Default to 0
+                    lineWidth: stroke.lineWidth || 2,
+                    points: stroke.points || [],
+                };
+                return acc;
+            }, {});
+
+            const payload = {
+                drawingMessages: drawingMessages, // Now an object, not an array
+                version: version++,
+                timeStamp: new Date().toISOString(),
+            };
+
+            console.log("Payload being sent to save:", payload);
+
             const response = await fetch("http://localhost:8080/api/whiteboard/save", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    drawingMessages: strokes, // Send strokes as part of the state
-                    version: version++,
-                    timeStamp: new Date().toISOString(),
-                }),
+                body: JSON.stringify(payload),
             });
 
             if (response.ok) {
