@@ -25,17 +25,13 @@ const App = () => {
     const whiteboardRef = useRef(null);
 
     /**
-     * Callback for handling incoming WebSocket messages.
-     */
-    const handleIncomingMessage = (data) => {
-        setStrokes((prevStrokes) => [...prevStrokes, data]);
-    };
-
-    /**
-     * Initializes WebSocket on mount.
+     * Initializes WebSocket and defines callback for incoming messages.
      */
     useEffect(() => {
-        connectWebSocket(handleIncomingMessage);
+        connectWebSocket((data) => {
+            console.log("Received drawing data:", data);
+            setStrokes((prevStrokes) => [...prevStrokes, data]); // Add received data to strokes.
+        });
     }, []);
 
     /**
@@ -45,12 +41,12 @@ const App = () => {
         setStrokes((prevStrokes) => {
             if(prevStrokes.length > 0){
                 const lastStroke = prevStrokes[prevStrokes.length-1];
-                setRedoStack((prevRedoStack) =>[...redoStack, lastStroke]); // Add the last stroke to the redo stack.
+                setRedoStack((prevRedoStack) =>[...prevRedoStack, lastStroke]); // Add the last stroke to the redo stack.
                 return prevStrokes.slice(0, -1); // Remove the last stroke.
             }
             return prevStrokes; // Return unchanged if no strokes.
         });
-    }, [redoStack]);
+    }, []);
 
     /**
      * Handle redoing the last undone stroke. Moves the last stroke from the redo stack back to the strokes array.
@@ -70,6 +66,9 @@ const App = () => {
      * Clear the whiteboard. Clears both the strokes array and the redo stack.
      */
     const clearWhiteboard = () => {
+        if(whiteboardRef.current) {
+            whiteboardRef.current.clearCanvas();
+        }
         setStrokes([]); // Clear all strokes.
         setRedoStack([]); // Clear redo stack.
     }
@@ -113,6 +112,7 @@ const App = () => {
                     redo={redo}
                     strokes={strokes}
                     setStrokes={setStrokes}
+                    stageRef={whiteboardRef}
                 />
                 <Whiteboard
                     ref={whiteboardRef}
@@ -127,6 +127,6 @@ const App = () => {
             </div>
         </div>
   );
-}
+};
 
 export default App;

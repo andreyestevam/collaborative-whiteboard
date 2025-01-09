@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import '../styles/Whiteboard.css';
-import {Stage, Layer, Line} from "konva";
+import Konva from "konva";
 import {sendDrawingMessage} from "../utils/websocket";
+import {generateUniqueID} from "../utils/idGenerator";
 
 /**
  * Whiteboard component. Renders an interactive whiteboard for users to draw on.
@@ -22,81 +23,149 @@ import {sendDrawingMessage} from "../utils/websocket";
  * @author Andrey Estevam Seabra
  */
 const Whiteboard = React.forwardRef(({tool, color, lineWidth, strokes, setStrokes, redoStack, setRedoStack}, ref) => {
-    // Store the current stroke being drawn. Updated whenever the user moves the mouse.
-    const [currentStroke, setCurrentStroke] = useState([]);
+    const containerRef = useRef(null);
+    const [stage, setStage] = useState(null);
+    const [currentLine, setCurrentLine] = useState(null);
+    let isDrawing = useRef(true);
 
-    // Handle the start of a new stroke.
-    const handleMouseDown = (e) => {
-        const stage = e.target.getStage();
-        const point = stage.getPointerPosition();
-        setCurrentStroke([{tool, color, lineWidth, points: [point.x, point.y]}]);
-    };
+    useEffect(() => {
+        const stageInstance = new Konva.Stage({
+            container: containerRef.current,
+            width: window.innerWidth,
+            height: window.innerHeight,
+        });
 
-    // Handle the drawing.
-    const handleMouseMove = (e) => {
-        // Do nothing whenever the user is not drawing (mouse not pressed).
-        if(!currentStroke.length) return;
+        const layer = new Konva.Layer();
+        stageInstance.add(layer);
 
-        const stage = e.target.getStage();
-        const point = stage.getPointerPosition();
+        setStage(stageInstance);
 
-        // Update the current stroke by adding the new point to points array.
-        const newStroke = [...currentStroke];
-        newStroke[0].points = [...newStroke[0].points, point.x, point.y];
-        setCurrentStroke(newStroke);
-    };
+        if(ref){
+            ref.current = {
+                clearCanvas: () => {
+                    layer.destroyChildren();
+                    layer.batchDraw();
+                },
+            };
+        }
 
-    // Handle the end of a stroke.
-    const handleMouseUp = () => {
-        if(currentStroke.length > 0){
-            setStrokes((prevStrokes) => {
-                setRedoStack([]); // Clear the redo stack whenever a new stroke is added.
-                return [...prevStrokes, ...currentStroke]; // Add the new stroke to strokes.
+        return() => {
+            stageInstance.destroy();
+        };
+    }, [ref]);
+
+    const createDrawingMessage = (line) => {
+        return{
+            id: generateUniqueID(),
+            type: "draw",
+            shape: "line",
+            color: line.stroke(),
+            points: line.points(),
+            lineWidth: line.strokeWidth(),
+            rotation: 0, // Always 0 for 2D drawing.
+        }
+    }
+
+    // Debugging tool, color and lineWidth values.
+    useEffect(() => {
+        console.log('Tool:', tool, 'Color:', color, 'LineWidth:', lineWidth);
+    }, [tool, color, lineWidth]);
+
+    // Redraw strokes whenever `strokes` changes
+    useEffect(() => {
+        if (!stage) return;
+
+        const layer = stage.findOne("Layer");
+        layer.destroyChildren(); // Clear existing shapes
+
+        strokes.forEach((stroke) => {
+            const line = new Konva.Line({
+                stroke: stroke.color,
+                strokeWidth: stroke.lineWidth,
+                lineCap: "round",
+                lineJoin: "round",
+                points: stroke.points,
+            });
+            layer.add(line);
+        });
+
+        layer.batchDraw();
+    }, [strokes, stage]);
+
+    useEffect(() => {
+        if(!stage) return;
+
+        const layer = stage.findOne("Layer");
+
+        const handleMouseDown = (e) => {
+            console.log("Mouse down at:", stage.getPointerPosition());
+            e.evt.preventDefault();
+
+            isDrawing.current = true;
+
+            const pos = stage.getPointerPosition();
+            const line = new Konva.Line({
+                stroke: tool === "eraser" ? "#f0f0f0" : color,
+                strokeWidth: parseFloat(lineWidth) || 2,
+                lineCap: "round",
+                lineJoin: "round",
+                points: [pos.x, pos.y],
             });
 
-            // Send the current stroke to the backend.
-            sendDrawingMessage(currentStroke[0]);
+            setCurrentLine(line);
+            layer.add(line);
+        };
 
-            setCurrentStroke([]);
+        const handleMouseMove = () => {
+            console.log("Mouse move at:", stage.getPointerPosition());
+            if(!isDrawing.current || !currentLine) return;
+
+            const pos = stage.getPointerPosition();
+            const newPoints = [...currentLine.points(), pos.x, pos.y];
+            currentLine.points(newPoints);
+
+            layer.batchDraw();
+        };
+
+        const handleMouseUp = () => {
+            console.log("Mouse up");
+            if (!isDrawing.current) return;
+
+            isDrawing.current = false;
+
+            if(currentLine){
+                const newStroke = createDrawingMessage(currentLine);
+                setStrokes((prevStrokes) => {
+                    setRedoStack([]);
+                    return [...prevStrokes, newStroke];
+                });
+
+                sendDrawingMessage(newStroke);
+                setCurrentLine(null);
+            }
+        };
+
+        // Attach Konva stage events.
+        stage.on("mousedown", handleMouseDown);
+        stage.on("mousemove", handleMouseMove);
+        stage.on("mouseup", handleMouseUp);
+
+        return () => {
+            stage.off("mousedown", handleMouseDown);
+            stage.off("mousemove", handleMouseMove);
+            stage.off("mouseup", handleMouseUp);
         }
-    };
+    }, [stage, tool, color, lineWidth, setStrokes, setRedoStack, currentLine]);
 
-    return(
-        <Stage
-            width={window.innerWidth}
-            height={window.innerHeight}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            ref={ref}
-        >
-            <Layer>
-                {/*Render all completed strokes.*/}
-                {strokes.map((stroke, index) => (
-                    <Line
-                    key={index}
-                    points={stroke.points}
-                    stroke={stroke.color}
-                    strokeWidth={stroke.lineWidth}
-                    lineCap="round"
-                    lineJoin="round"
-                    />
-                ))}
-
-                {/*Render the current stroke being drawn.*/}
-                {currentStroke.map((stroke, index) => (
-                    <Line
-                    key={`current-${index}`}
-                    points={stroke.points}
-                    stroke={stroke.color}
-                    strokeWidth={stroke.lineWidth}
-                    lineCap="round"
-                    lineJoin="round"
-                    />
-                ))}
-            </Layer>
-        </Stage>
-    );
+    return <div
+        ref={containerRef}
+        style={{
+            width: "100%",
+            height: "100vh",
+            background: "#f0f0f0",
+            cursor: tool === "eraser" ? "not-allowed" : "crosshair",
+        }}
+    />;
 });
 
 export default Whiteboard;

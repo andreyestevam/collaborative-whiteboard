@@ -19,6 +19,7 @@ import {jsPDF} from 'jspdf';
 const Sidebar = ({undo, redo, strokes, stageRef, setStrokes}) => {
     // State to toggle dropdown visibility
     const [dropdownVisible, setDropdownVisible] = useState(false);
+    let version = 1;
 
     // Toggle dropdown visibility
     const toggleDropdown = () => {
@@ -29,6 +30,19 @@ const Sidebar = ({undo, redo, strokes, stageRef, setStrokes}) => {
      * Save the current whiteboard state to the backend.
      */
     const saveState = async () => {
+        const drawingMessages = strokes.reduce((acc, stroke) => {
+            acc[stroke.id] = stroke;
+            return acc;
+        }, {});
+
+        const requestBody = {
+            drawingMessages: drawingMessages,
+            version: version++,
+            timeStamp: new Date().toISOString(),
+        };
+
+        console.log("Request body:", requestBody);
+
         try {
             const response = await fetch("http://localhost:8080/api/whiteboard/save", {
                 method: "POST",
@@ -37,7 +51,7 @@ const Sidebar = ({undo, redo, strokes, stageRef, setStrokes}) => {
                 },
                 body: JSON.stringify({
                     drawingMessages: strokes, // Send strokes as part of the state
-                    version: 1,
+                    version: version++,
                     timeStamp: new Date().toISOString(),
                 }),
             });
@@ -98,11 +112,15 @@ const Sidebar = ({undo, redo, strokes, stageRef, setStrokes}) => {
     }
 
     const handleExportPDF = () => {
-        const uri = stageRef.current.toDataURL();
-        const pdf = new jsPDF();
-        pdf.addImage(uri, 'PNG', 10, 10, 180, 160);
-        pdf.save('whiteboard.pdf');
-    }
+        if(stageRef && stageRef.current) {
+            const uri = stageRef.current.toDataURL();
+            const pdf = new jsPDF();
+            pdf.addImage(uri, 'PNG', 10, 10, 180, 160);
+            pdf.save('whiteboard.pdf');
+        }else{
+            console.error("stageRef is not properly defined.")
+        }
+    };
 
     return (
         <div className="sidebar">

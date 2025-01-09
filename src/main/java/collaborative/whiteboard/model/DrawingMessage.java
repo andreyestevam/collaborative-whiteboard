@@ -28,6 +28,14 @@ public class DrawingMessage{
      */
     private String color;
     /**
+     * Store the array of numbers for coordinates.
+     */
+    private List<Double> points;
+    /**
+     * Store the line width of the drawing.
+     */
+    private double lineWidth;
+    /**
      * Store the orientation of the object. Not currently used for the 2D version (will be implemented for the 3D version).
      */
     private List<Double> rotation; // Not currently used, but will be implemented for the 3D version.
@@ -63,12 +71,14 @@ public class DrawingMessage{
                 ", type='" + type + '\'' +
                 ", shape='" + shape + '\'' +
                 ", color='" + color + '\'' +
+                ", points=" + points +
+                ", lineWidth=" + lineWidth +
                 ", rotation=" + rotation +
                 '}';
     }
 
     // Getter and setter methods.
-    public String getId(){return id;}
+    public String getId() {return id;}
 
     public String getType(){
         return type;
@@ -93,6 +103,14 @@ public class DrawingMessage{
     public void setColor(String color){
         this.color = color;
     }
+
+    public List<Double> getPoints(List<Double> points){return points;}
+
+    public void setPoints(List<Double> points){this.points = points;}
+
+    public double getLineWidth(){return lineWidth;}
+
+    public void setLineWidth(double lineWidth){this.lineWidth = lineWidth;}
 
     public List<Double> getRotation(){
         return rotation;

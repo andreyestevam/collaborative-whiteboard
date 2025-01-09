@@ -4,6 +4,7 @@ import collaborative.whiteboard.controller.exception.GlobalExceptionHandler;
 import collaborative.whiteboard.manager.StateManager;
 import collaborative.whiteboard.model.WhiteboardState;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -38,7 +39,8 @@ public class WhiteboardController {
      * @return a confirmation message about the successful save.
      */
     @PostMapping("/save")
-    public String saveState(@RequestBody WhiteboardState state){
+    public ResponseEntity<String> saveState(@RequestBody WhiteboardState state){
+        System.out.println("Saving state: " + state);
         if(state.getTimeStamp() == null || state.getTimeStamp().isEmpty()){
             throw new IllegalArgumentException("Timestamp cannot be null or empty."); // Handled by GlobalExceptionHandler.
         }
@@ -47,7 +49,7 @@ public class WhiteboardController {
         }
         stateManager.addAction(state);
         stateManager.broadcastState();
-        return "Whiteboard current state successfully saved.";
+        return ResponseEntity.ok("Whiteboard current state successfully saved.");
     }
 
     /**
@@ -59,8 +61,10 @@ public class WhiteboardController {
     @GetMapping("/load")
     public WhiteboardState loadState(){
         if(stateManager.getCurrentState() == null){
+            System.out.println("No state found.");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No state found.");
         }
+        System.out.println("Loaded state: " + stateManager.getCurrentState());
         return stateManager.getCurrentState(); // Return the last saved state.
     }
 
